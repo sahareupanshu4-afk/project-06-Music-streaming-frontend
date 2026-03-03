@@ -353,14 +353,24 @@ export function PlayerProvider({ children }) {
     audioRef
   }
   
+  const getAudioUrl = (url) => {
+    if (!url) return ''
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
+    if (backendUrl) {
+      return `${backendUrl}/api/audio/proxy?url=${encodeURIComponent(url)}`
+    }
+    return `/api/audio/proxy?url=${encodeURIComponent(url)}`
+  }
+
   return (
     <PlayerContext.Provider value={value}>
       {children}
       <audio
         ref={audioRef}
-        src={currentTrack?.audio_url ? `/api/audio/proxy?url=${encodeURIComponent(currentTrack.audio_url)}` : ''}
+        src={getAudioUrl(currentTrack?.audio_url)}
         preload="metadata"
         className="hidden"
+        crossOrigin="anonymous"
       />
     </PlayerContext.Provider>
   )
