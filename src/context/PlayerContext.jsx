@@ -355,12 +355,34 @@ export function PlayerProvider({ children }) {
   
   const getAudioUrl = (url) => {
     if (!url) return ''
+    console.log('Getting audio URL for:', url)
+    
     const backendUrl = import.meta.env.VITE_BACKEND_URL
+    console.log('Backend URL from env:', backendUrl)
+    
     if (backendUrl) {
-      return `${backendUrl}/api/audio/proxy?url=${encodeURIComponent(url)}`
+      // Handle both cases: backendUrl with /api suffix and without
+      let baseUrl = backendUrl
+      if (backendUrl.endsWith('/api')) {
+        baseUrl = backendUrl.slice(0, -4) // Remove /api suffix
+      }
+      const proxyUrl = `${baseUrl}/api/audio/proxy?url=${encodeURIComponent(url)}`
+      console.log('Proxy URL:', proxyUrl)
+      return proxyUrl
     }
-    // Fallback for local development
-    return `http://localhost:5000/api/audio/proxy?url=${encodeURIComponent(url)}`
+    
+    // Direct URL as fallback
+    console.log('Using direct URL')
+    return url
+  }
+
+  const handleAudioError = (e) => {
+    console.error('Audio error:', e)
+    console.error('Audio error details:', {
+      code: audioRef.current?.error?.code,
+      message: audioRef.current?.error?.message,
+      src: audioRef.current?.src
+    })
   }
 
   return (
@@ -372,6 +394,7 @@ export function PlayerProvider({ children }) {
         preload="metadata"
         className="hidden"
         crossOrigin="anonymous"
+        onError={handleAudioError}
       />
     </PlayerContext.Provider>
   )
