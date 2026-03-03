@@ -355,11 +355,12 @@ export function PlayerProvider({ children }) {
   
   const getAudioUrl = (url) => {
     if (!url) return ''
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
+    const backendUrl = import.meta.env.VITE_BACKEND_URL
     if (backendUrl) {
       return `${backendUrl}/api/audio/proxy?url=${encodeURIComponent(url)}`
     }
-    return `/api/audio/proxy?url=${encodeURIComponent(url)}`
+    // Fallback for local development
+    return `http://localhost:5000/api/audio/proxy?url=${encodeURIComponent(url)}`
   }
 
   return (
