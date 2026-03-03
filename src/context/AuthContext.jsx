@@ -161,13 +161,24 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true)
       const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      if (error) {
+        console.error('Supabase signOut error:', error)
+      }
+      // Clear state regardless of error
       setUser(null)
       setProfile(null)
       setSession(null)
+      // Clear local storage
+      localStorage.removeItem('supabase.auth.token')
       return { error: null }
     } catch (error) {
-      return { error }
+      console.error('signOut catch error:', error)
+      // Still clear state on error
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+      localStorage.removeItem('supabase.auth.token')
+      return { error: null }
     } finally {
       setLoading(false)
     }
